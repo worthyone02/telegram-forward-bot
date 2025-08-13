@@ -1,7 +1,7 @@
 from telegram.ext import Updater, MessageHandler, Filters
 
 # === BOT CONFIG ===
-TOKEN = "8051531632:AAHLkFNnjxyQzLV8EoycAMbhaG2j0rGsrr4"  # Example: "1234567890:ABCdefGhijKLMnopQRstUVwxyZ"
+TOKEN = "8051531632:AAEgYX2pVfwlHXtuV718Znbag2HQc7GJbMo"  # Example: "1234567890:ABCdefGhijKLMnopQRstUVwxyZ"
 SOURCE_CHAT_ID = "-1002552543046"  # Example: "-1001234567890"
 SOURCE_TOPIC_ID = "75"  # Example: "55"
 DESTINATION_CHAT_ID = "-1002386689030"  # Example: "-1009876543210"
