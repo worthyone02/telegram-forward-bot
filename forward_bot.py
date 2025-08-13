@@ -1,55 +1,33 @@
-from telegram.ext import Updater, MessageHandler, Filters
+import os
+from telegram import Update
+from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
-# === BOT CONFIG ===
-TOKEN = "8262873665:AAEluYkY8YFcaiyh-MmaZdYyieFbya7GPBA"  # Example: "1234567890:ABCdefGhijKLMnopQRstUVwxyZ"
-SOURCE_CHAT_ID = "-1002552543046"  # Example: "-1001234567890"
-SOURCE_TOPIC_ID = "75"  # Example: "55"
-DESTINATION_CHAT_ID = "-1002386689030"  # Example: "-1009876543210"
+BOT_TOKEN = os.environ.get("8051531632:AAHLkFNnjxyQzLV8EoycAMbhaG2j0rGsrr4")
+SOURCE_CHAT_ID = int(os.environ.get("-1002552543046"))       # group id
+DESTINATION_CHAT_ID = int(os.environ.get("-1002386689030")) # channel id
+SOURCE_TOPIC_ID = int(os.environ.get("75"))     # topic/thread id
 
-# === FORWARD FUNCTION ===
-def forward_from_topic(update, context):
-    message = update.message
+async def forward_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    msg = update.effective_message
 
-    # Convert to int for comparison
-    if (
-        str(update.effective_chat.id) == SOURCE_CHAT_ID
-        and str(message.message_thread_id) == SOURCE_TOPIC_ID
-    ):
-        # Forward based on type without exposing original sender
-        if message.text:
-            context.bot.send_message(chat_id=int(DESTINATION_CHAT_ID), text=message.text)
-        elif message.photo:
-            context.bot.send_photo(
-                chat_id=int(DESTINATION_CHAT_ID),
-                photo=message.photo[-1].file_id,
-                caption=message.caption
-            )
-        elif message.audio:
-            context.bot.send_audio(
-                chat_id=int(DESTINATION_CHAT_ID),
-                audio=message.audio.file_id,
-                caption=message.caption
-            )
-        elif message.video:
-            context.bot.send_video(
-                chat_id=int(DESTINATION_CHAT_ID),
-                video=message.video.file_id,
-                caption=message.caption
-            )
-        else:
-            # Fallback generic forward
-            context.bot.forward_message(
-                chat_id=int(DESTINATION_CHAT_ID),
-                from_chat_id=int(SOURCE_CHAT_ID),
-                message_id=message.message_id
-            )
+    # Only forward messages from the specific group + topic
+    if msg.chat_id == SOURCE_CHAT_ID and msg.message_thread_id == SOURCE_TOPIC_ID:
+        # Use copy_message to hide original sender
+        await context.bot.copy_message(
+            chat_id=DESTINATION_CHAT_ID,
+            from_chat_id=msg.chat_id,
+            message_id=msg.message_id
+        )
 
-# === RUN BOT ===
-updater = Updater(TOKEN, use_context=True)
-dp = updater.dispatcher
+app = ApplicationBuilder().token(BOT_TOKEN).build()
+app.add_handler(MessageHandler(filters.ALL, forward_message))
 
-dp.add_handler(MessageHandler(Filters.all, forward_from_topic))
+APP_URL = os.environ.get("APP_URL")
+WEBHOOK_PATH = f"/{BOT_TOKEN}"
 
-updater.start_polling()
-print("Bot is running and filtering by topic...")
-updater.idle()
+app.run_webhook(
+    listen="0.0.0.0",
+    port=int(os.environ.get("PORT", 8080)),
+    url_path=BOT_TOKEN,
+    webhook_url=f"{APP_URL}/{BOT_TOKEN}"
+)
