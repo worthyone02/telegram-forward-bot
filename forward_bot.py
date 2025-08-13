@@ -22,7 +22,7 @@ async def forward_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 app = ApplicationBuilder().token(BOT_TOKEN).build()
 app.add_handler(MessageHandler(filters.ALL, forward_message))
 
-APP_URL = os.environ.get("APP_URL")
+APP_URL = os.environ.get("primitive-cam-telegram-forward-bot-48b5f354.koyeb.app/")
 WEBHOOK_PATH = f"/{BOT_TOKEN}"
 
 app.run_webhook(
